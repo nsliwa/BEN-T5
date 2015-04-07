@@ -79,7 +79,7 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
-    _dsid = @8;
+    _dsid = @1;
     _isCalibrating = NO;
     _isWaitingForInputData = YES;
     _calibrationStage = -1;
