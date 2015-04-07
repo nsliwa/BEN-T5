@@ -62,7 +62,14 @@ class UpdateModelForDatasetId(BaseHandler):
 		if l:
 			c1.fit(f,l); # training
 			lstar = c1.predict(f);
-			self.clf = c1;
+
+			#c[dsid] = c1
+			
+			if(self.clf == []):
+				self.clf = {dsid: c1}
+			else:
+				self.clf[dsid] = c1
+				
 			acc = sum(lstar==l)/float(len(l));
 			bytes = pickle.dumps(c1);
 			self.db.models.update({"dsid":dsid},
@@ -86,11 +93,12 @@ class PredictOneFromDatasetId(BaseHandler):
 
 		# load the model from the database (using pickle)
 		# we are blocking tornado!! no!!
-		if(self.clf == []):
+		if(self.clf.get(dsid) is None):
 			print 'Loading Model From DB'
 			tmp = self.db.models.find_one({"dsid":dsid})
-			self.clf = pickle.loads(tmp['model'])
-		predLabel = self.clf.predict(fvals);
+			self.clf[dsid] = pickle.loads(tmp['model'])
+	
+		predLabel = self.clf[dsid].predict(fvals);
 		self.write_json({"prediction":str(predLabel)})
 		#self.client.close()
 
